@@ -1,0 +1,42 @@
+version: '3'
+services:
+  strapi:
+    image: strapi/strapi
+    env_file: .env
+    environment:
+      DATABASE_CLIENT: ${DATABASE_CLIENT}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_SSL: 'false'
+    networks:
+      - strapi-app-network
+    volumes:
+      - ./app:/srv/app
+    ports:
+      - '1337:1337'
+    depends_on:
+      - strapidb
+
+  strapidb:
+    image: mariadb
+    container_name: strapidb
+    networks:
+      - strapi-app-network
+    volumes:
+      - ./data:/var/lib/mysql
+    env_file: .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD}
+      MYSQL_DATABASE: ${DATABASE_NAME}
+      MYSQL_USER: strapi
+      MYSQL_PASSWORD: strapi
+
+networks:
+  strapi-app-network:
+    driver: bridge
+
+volumes:
+  data:
